@@ -11,7 +11,7 @@
 
 
 _major_v = '0'
-_minor_v = '0.2'
+_minor_v = '0.3'
 
 
 from os import path
@@ -46,7 +46,7 @@ setup(
     packages=[
         'auth',
     ],
-    python_requires='>=3.7',
+    python_requires='>=3.6',
     install_requires=requirements,
     test_suite='nose.collector',
     tests_require=['nose'],
@@ -54,7 +54,7 @@ setup(
     project_urls={
         'Source': 'https://github.com/hyunjong-lee/fab-auth-keycloak',
     },
-    download_url='https://github.com/hyunjong-lee/fab-auth-keycloak/archive/v0.0.2.tar.gz',
+    download_url='https://github.com/hyunjong-lee/fab-auth-keycloak/archive/v0.0.3.tar.gz',
     keywords=['keycloak', 'AzureAD', 'superset'],
     license='LGPLv2+',
 )
