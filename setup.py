@@ -11,7 +11,7 @@
 
 
 _major_v = '0'
-_minor_v = '0.5'
+_minor_v = '0.6'
 
 
 from os import path
@@ -31,7 +31,7 @@ with pathlib.Path('requirements.txt').open() as rin:
 
 
 setup(
-    name='fab-auth-keycloak',
+    name='fab_auth_keycloak',
     version=f'{_major_v}.{_minor_v}',
     description='Flask AppBuilder Authentication plugin',
     url='https://github.com/hyunjong-lee/fab-auth-keycloak',
