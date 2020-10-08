@@ -11,7 +11,7 @@
 
 
 _major_v = '0'
-_minor_v = '0.4'
+_minor_v = '0.5'
 
 
 from os import path
