@@ -11,12 +11,14 @@
 
 
 _major_v = '0'
-_minor_v = '0.3'
+_minor_v = '0.4'
 
 
 from os import path
+import pathlib
 import sys
 
+import pkg_resources
 from setuptools import setup, find_packages
 
 
@@ -24,8 +26,8 @@ if sys.version_info[:3] < (3, 6):
     raise RuntimeError("Python version 3.6 or later required.")
 
 
-with open('requirements.txt') as f:
-    requirements = f.read().splitlines()
+with pathlib.Path('requirements.txt').open() as rin:
+    requirements = [str(req) for req in pkg_resources.parse_requirements(rin)]
 
 
 setup(
@@ -54,7 +56,7 @@ setup(
     project_urls={
         'Source': 'https://github.com/hyunjong-lee/fab-auth-keycloak',
     },
-    download_url='https://github.com/hyunjong-lee/fab-auth-keycloak/archive/v0.0.3.tar.gz',
+    download_url=f'https://github.com/hyunjong-lee/fab-auth-keycloak/archive/v{_major_v}.{_minor_v}.tar.gz',
     keywords=['keycloak', 'AzureAD', 'superset'],
     license='LGPLv2+',
 )
