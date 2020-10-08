@@ -76,7 +76,7 @@ class KeycloakAuthOIDCView(AuthOIDView):
 
             # sync roles from keycloak to flask
             user.roles.clear()
-            for role in roles:
+            for role in info.get(KEYCLOAK_CLIENT_ROLE_OIDC_FIELD):
                 user.roles.append(sm.find_role(role))
             sm.update_user(user)
 
