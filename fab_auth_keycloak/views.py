@@ -78,6 +78,7 @@ class KeycloakAuthOIDCView(AuthOIDView):
             user.roles.clear()
             for role in info.get(KEYCLOAK_CLIENT_ROLE_OIDC_FIELD):
                 user.roles.append(sm.find_role(role))
+                logger.info(f"assign role: {role}, find_role: {sm.find_role(role)} to user: {info.get(EMAIL_OIDC_FIELD)}")
             sm.update_user(user)
 
             login_user(user, remember=False)
