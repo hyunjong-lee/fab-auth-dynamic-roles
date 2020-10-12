@@ -72,7 +72,7 @@ class KeycloakAuthOIDCView(AuthOIDView):
                     role=sm.find_role(sm.auth_user_registration_role)
                 )
 
-                loggger.info(f"user added: {info.get(EMAIL_OIDC_FIELD)}")
+                logger.info(f"user added: {info.get(EMAIL_OIDC_FIELD)}")
 
             # sync roles from keycloak to flask
             user.roles.clear()
