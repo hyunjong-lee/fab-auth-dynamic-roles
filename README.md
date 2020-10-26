@@ -75,10 +75,10 @@ OIDC_USER_INFO_ENABLED = True
 - Required dependencies
 
 ```python
-flask-admin==1.5.6
-flask-oidc==1.4.0
-authlib==0.14.3
-fab-auth-keycloak==0.1.0
+flask-admin>=1.5.6
+flask-oidc>=1.4.0
+authlib>=0.14.3
+fab-auth-keycloak>=0.1.0
 ```
 
 ## References
