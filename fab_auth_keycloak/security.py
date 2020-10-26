@@ -26,3 +26,14 @@ try:
 
 except ImportError:
     logger.error("couldn't import SupersetSecurityManager")
+
+
+try:
+    from airflow.www_rbac.security import AirflowSecurityManager
+    class AirflowOIDCSecurityManager(KeycloakOIDCSecurityManagerMixin,
+                                      SupersetSecurityManager):
+        pass
+
+except ImportError:
+    logger.error("couldn't import AirflowSecurityManager")
+
