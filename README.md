@@ -14,7 +14,11 @@
   - Go to https://portal.azure.com
   - ...
   - The keypoint is `Token configuration` for role mapping in `Keycloak`.
-  - We append `groups` token to reveal group id list for each user.
+  - You need to claim `groups` token to reveal group id list for each user if you want to assign a specific role to a specific group in `Keycloak`.
+    - [Azure Document: groups-overage-claim](https://docs.microsoft.com/en-us/azure/active-directory/develop/id-tokens#groups-overage-claim)
+    - ![claim groups](./assets/azuread_token.png)
+    - Form of `groups` token is array of group id.
+      - `groups: ["e0d3ad3d-0000-1111-2222-3c5f5c52ab9b"]`
 
 ### Keycloak
 - Go to your keycloak web UI.
