@@ -1,9 +1,16 @@
 # -*- coding: utf-8 -*-
-"""fab-auth-keycloak
+"""fab-auth-dynamic-roles
 
-#### A plugin for authentication among keycloak and Azure AD.
+#### A plugin for authentication to sync roles dynamically
 
 #### Supports
+
+##### Auth Modes
+
+- AUTH_OID
+- AUTH_OAUTH
+
+##### Applications
 
 - Superset
 
@@ -11,7 +18,7 @@
 
 
 _major_v = '0'
-_minor_v = '1.2'
+_minor_v = '1.0'
 
 
 from os import path
@@ -31,10 +38,10 @@ with pathlib.Path('requirements.txt').open() as rin:
 
 
 setup(
-    name='fab-auth-keycloak',
+    name='fab-auth-dynamic-roles',
     version=f'{_major_v}.{_minor_v}',
     description='Flask AppBuilder Authentication plugin',
-    url='https://github.com/hyunjong-lee/fab-auth-keycloak',
+    url='https://github.com/hyunjong-lee/fab-auth-dynamic-roles',
     author='Hyunjong Lee',
     author_email='hyunjong.lee.s@gmail.com',
     classifiers=[
@@ -46,7 +53,7 @@ setup(
         'Programming Language :: Python :: 3.8',
     ],
     packages=[
-        'fab_auth_keycloak',
+        'fab_auth_dynamic_roles',
     ],
     python_requires='>=3.6',
     install_requires=requirements,
@@ -54,9 +61,9 @@ setup(
     tests_require=['nose'],
     entry_points={},
     project_urls={
-        'Source': 'https://github.com/hyunjong-lee/fab-auth-keycloak',
+        'Source': 'https://github.com/hyunjong-lee/fab-auth-dynamic-roles',
     },
-    download_url=f'https://github.com/hyunjong-lee/fab-auth-keycloak/archive/v{_major_v}.{_minor_v}.tar.gz',
-    keywords=['keycloak', 'AzureAD', 'superset'],
+    download_url=f'https://github.com/hyunjong-lee/fab-auth-dynamic-roles/archive/v{_major_v}.{_minor_v}.tar.gz',
+    keywords=['dynamic roles', 'flask appbuilder', 'keycloak', 'AzureAD', 'superset', 'AUTH_OID', 'AUTH_OAUTH'],
     license='LGPLv2+',
 )
