@@ -9,7 +9,7 @@ from .oidc_views import DynamicRoleAuthOIDCView
 from .oauth_views import DynamicRoleAuthOAuthView
 
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class DynamicRoleSecurityManagerMixin:
@@ -27,12 +27,36 @@ try:
     class SupersetOIDCSecurityManager(DynamicRoleSecurityManagerMixin,
                                       SupersetSecurityManager):
         pass
+
     class SupersetOAuthSecurityManager(DynamicRoleSecurityManagerMixin,
                                        SupersetSecurityManager):
-        pass
+        def __init__(self, appbuilder):
+            super().__init__(appbuilder)
+            if self.auth_type == AUTH_OAUTH:
+                self.oauth_user_info = self.get_oauth_user_info
+
+        def get_oauth_user_info(self, provider, resp):
+            if provider != 'azure':
+                return super().get_oauth_user_info(provider, resp)
+
+            log.error("message from fab_auth_dynamic_roles")
+            log.error("Azure response received : {0}".format(resp))
+            id_token = resp["id_token"]
+            log.error(str(id_token))
+            me = self._azure_jwt_token_parse(id_token)
+            log.error("Parse JWT token : {0}".format(me))
+            return {
+                "name": me.get("name", ""),
+                "email": me["upn"],
+                "first_name": me.get("given_name", ""),
+                "last_name": me.get("family_name", ""),
+                "id": me["oid"],
+                "username": me["oid"],
+                "roles": me.get("roles", []),
+            }
 
 except ImportError:
-    logger.error("from superset.security import SupersetSecurityManager failed")
+    log.error("from superset.security import SupersetSecurityManager failed")
 
 
 try:
@@ -45,5 +69,5 @@ try:
         pass
 
 except ImportError:
-    logger.error("from airflow.www_rbac.security import AirflowSecurityManager failed")
+    log.error("from airflow.www_rbac.security import AirflowSecurityManager failed")
 

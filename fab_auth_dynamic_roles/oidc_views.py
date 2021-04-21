@@ -41,7 +41,7 @@ RESOURCE_ACCESS_APP_OIDC_FIELD = os.getenv(
 OIDC_LOGOUT_URI = 'OIDC_LOGOUT_URI'
 
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class DynamicRoleAuthOIDCView(AuthOIDView):
@@ -71,19 +71,19 @@ class DynamicRoleAuthOIDCView(AuthOIDView):
                     email=info.get(EMAIL_OIDC_FIELD),
                     role=sm.find_role(sm.auth_user_registration_role)
                 )
-                logger.info(f"user added: {info.get(EMAIL_OIDC_FIELD)}")
+                log.info(f"user added: {info.get(EMAIL_OIDC_FIELD)}")
 
             # sync roles from keycloak to flask
             user.roles.clear()
             sm.update_user(user)
 
             if info.get(CLIENT_ROLE_OIDC_FIELD) is None:
-                logger.error(f'user {info.get(EMAIL_OIDC_FIELD)} does not have ROLE')
-                logger.error(f'user info: {info}')
+                log.error(f'user {info.get(EMAIL_OIDC_FIELD)} does not have ROLE')
+                log.error(f'user info: {info}')
             else:
                 for role in info.get(CLIENT_ROLE_OIDC_FIELD):
                     user.roles.append(sm.find_role(role))
-                    logger.info(f"assign role: {role}, find_role: {sm.find_role(role)} to user: {info.get(EMAIL_OIDC_FIELD)}")
+                    log.info(f"assign role: {role}, find_role: {sm.find_role(role)} to user: {info.get(EMAIL_OIDC_FIELD)}")
                 sm.update_user(user)
 
             login_user(user, remember=False)
