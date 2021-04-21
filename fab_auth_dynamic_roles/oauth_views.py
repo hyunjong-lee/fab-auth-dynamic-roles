@@ -1,5 +1,6 @@
-import os
 import logging
+import os
+import re
 import urllib
 
 from flask import flash, g, redirect, request, session, url_for
@@ -10,47 +11,22 @@ from flask_login import login_user
 import jwt
 
 
-USERNAME_OIDC_FIELD = os.getenv(
-    'USERNAME_OIDC_FIELD',
-    default='preferred_username',
-)
-
-FIRST_NAME_OIDC_FIELD = os.getenv(
-    'FIRST_NAME_OIDC_FIELD',
-    default='given_name',
-)
-
-LAST_NAME_OIDC_FIELD = os.getenv(
-    'LAST_NAME_OIDC_FIELD',
-    default='family_name',
-)
-
-EMAIL_OIDC_FIELD = os.getenv(
-    'EMAIL_OIDC_FIELD',
+EMAIL_OAUTH_FIELD = os.getenv(
+    'EMAIL_OAUTH_FIELD',
     default='email',
 )
 
-CLIENT_ROLE_OIDC_FIELD = os.getenv(
-    'CLIENT_ROLE_OIDC_FIELD',
+CLIENT_ROLE_OAUTH_FIELD = os.getenv(
+    'CLIENT_ROLE_OAUTH_FIELD',
     default='roles',
 )
-
-RESOURCE_ACCESS_APP_OIDC_FIELD = os.getenv(
-    'RESOURCE_ACCESS_APP_OIDC_FIELD',
-    default='superset',
-)
-
-OIDC_LOGOUT_URI = 'OIDC_LOGOUT_URI'
 
 
 log = logging.getLogger(__name__)
 
 
-# 이 view에서 해야할 작업
-
-# - Sync roles dynamically
+# TODO
 # - AzureAD의 경우 Group 정보 얻어와서 인증을 좀 더 부드럽게
-# - 로그인 시 설정된 OAuth가 하나라면 바로 이동하도록 설정
 
 class DynamicRoleAuthOAuthView(AuthOAuthView):
 
@@ -110,3 +86,72 @@ class DynamicRoleAuthOAuthView(AuthOAuthView):
             log.error("Error on OAuth authorize: {0}".format(e))
             flash(as_unicode(self.invalid_login_message), "warning")
             return redirect(self.appbuilder.get_url_for_index)
+
+    @expose("/oauth-authorized/<provider>")
+    def oauth_authorized(self, provider):
+        log.debug("Authorized init")
+        resp = self.appbuilder.sm.oauth_remotes[provider].authorize_access_token()
+        if resp is None:
+            flash(u"You denied the request to sign in.", "warning")
+            return redirect(self.appbuilder.get_url_for_login)
+
+        log.debug("OAUTH Authorized resp: {0}".format(resp))
+        # Retrieves specific user info from the provider
+        try:
+            self.appbuilder.sm.set_oauth_session(provider, resp)
+            userinfo = self.appbuilder.sm.oauth_user_info(provider, resp)
+        except Exception as e:
+            log.error("Error returning OAuth user info: {0}".format(e))
+            user = None
+        else:
+            log.debug("User info retrieved from {0}: {1}".format(provider, userinfo))
+            # User email is not whitelisted
+            if provider in self.appbuilder.sm.oauth_whitelists:
+                whitelist = self.appbuilder.sm.oauth_whitelists[provider]
+                allow = False
+                for e in whitelist:
+                    if re.search(e, userinfo["email"]):
+                        allow = True
+                        break
+                if not allow:
+                    flash(u"You are not authorized.", "warning")
+                    return redirect(self.appbuilder.get_url_for_login)
+            else:
+                log.debug("No whitelist for OAuth provider")
+            user = self.appbuilder.sm.auth_user_oauth(userinfo)
+
+        if user is None:
+            flash(as_unicode(self.invalid_login_message), "warning")
+            return redirect(self.appbuilder.get_url_for_login)
+        else:
+            # sync roles from OAuth to flask
+            sm = self.appbuilder.sm
+
+            user.roles.clear()
+            sm.update_user(user)
+
+            if userinfo.get(CLIENT_ROLE_OAUTH_FIELD) is None:
+                log.error(f'userinfo does not have {CLIENT_ROLE_OAUTH_FIELD} field')
+                log.error(f'user info: {userinfo}')
+            else:
+                for role in userinfo.get(CLIENT_ROLE_OAUTH_FIELD):
+                    user.roles.append(sm.find_role(role))
+                    log.info(f"assign role: {role}, find_role: {sm.find_role(role)} to user: {userinfo.get(EMAIL_OAUTH_FIELD)}")
+                sm.update_user(user)
+
+            login_user(user)
+            try:
+                state = jwt.decode(
+                    request.args["state"],
+                    self.appbuilder.app.config["SECRET_KEY"],
+                    algorithms=["HS256"],
+                )
+            except jwt.InvalidTokenError:
+                raise Exception("State signature is not valid!")
+
+            try:
+                next_url = state["next"][0] or self.appbuilder.get_url_for_index
+            except (KeyError, IndexError):
+                next_url = self.appbuilder.get_url_for_index
+
+            return redirect(next_url)

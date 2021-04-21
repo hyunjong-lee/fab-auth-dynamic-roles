@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 import urllib
 
 from flask import redirect, request
@@ -73,7 +73,7 @@ class DynamicRoleAuthOIDCView(AuthOIDView):
                 )
                 log.info(f"user added: {info.get(EMAIL_OIDC_FIELD)}")
 
-            # sync roles from keycloak to flask
+            # sync roles from OIDC to flask
             user.roles.clear()
             sm.update_user(user)
 
