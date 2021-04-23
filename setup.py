@@ -18,7 +18,7 @@
 
 
 _major_v = '0'
-_minor_v = '0.4'
+_minor_v = '1.0'
 
 
 from os import path
@@ -64,6 +64,6 @@ setup(
         'Source': 'https://github.com/hyunjong-lee/fab-auth-dynamic-roles',
     },
     download_url=f'https://github.com/hyunjong-lee/fab-auth-dynamic-roles/archive/v{_major_v}.{_minor_v}.tar.gz',
-    keywords=['dynamic roles', 'flask appbuilder', 'keycloak', 'AzureAD', 'superset', 'AUTH_OID', 'AUTH_OAUTH'],
+    keywords=['dynamic roles', 'flask appbuilder', 'keycloak', 'AzureAD', 'superset', 'AUTH_OID', 'AUTH_OAUTH', "OAUTH", "OIDC"],
     license='LGPLv2+',
 )
