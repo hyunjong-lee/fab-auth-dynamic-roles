@@ -72,3 +72,15 @@ try:
 except ImportError:
     log.error("from airflow.www_rbac.security import AirflowSecurityManager failed")
 
+
+try:
+    from astronomer.flask_appbuilder.security import AirflowAstroSecurityManager
+    class AirflowAstroOIDCSecurityManager(DynamicRoleSecurityManagerMixin,
+                                          AirflowAstroSecurityManager):
+        pass
+    class AirflowAstroOAuthSecurityManager(DynamicRoleSecurityManagerMixin,
+                                          AirflowAstroSecurityManager):
+        pass
+
+except ImportError:
+    log.error("from astronomer.flask_appbuilder.security import AirflowAstroSecurityManager failed")
