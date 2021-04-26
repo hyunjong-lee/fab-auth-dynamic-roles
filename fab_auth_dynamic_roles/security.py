@@ -61,13 +61,37 @@ except ImportError:
 
 
 try:
-    from airflow.www_rbac.security import AirflowSecurityManager
+    from airflow.www.security import AirflowSecurityManager
     class AirflowOIDCSecurityManager(DynamicRoleSecurityManagerMixin,
                                      AirflowSecurityManager):
         pass
     class AirflowOAuthSecurityManager(DynamicRoleSecurityManagerMixin,
                                       AirflowSecurityManager):
-        pass
+        def __init__(self, appbuilder):
+            super().__init__(appbuilder)
+            if self.auth_type == AUTH_OAUTH:
+                self.oauth_user_info = self.get_oauth_user_info
+
+        def get_oauth_user_info(self, provider, resp):
+            if provider != 'azure':
+                return super().get_oauth_user_info(provider, resp)
+
+            log.error("message from fab_auth_dynamic_roles")
+            log.error("Azure response received : {0}".format(resp))
+            id_token = resp["id_token"]
+            log.error(str(id_token))
+            me = self._azure_jwt_token_parse(id_token)
+            log.error("Parse JWT token : {0}".format(me))
+            # must set username from email and email from email for migration from OIDC to OAuth
+            return {
+                "name": me.get("name", ""),
+                "email": me["email"],
+                "first_name": me.get("given_name", ""),
+                "last_name": me.get("family_name", ""),
+                "id": me["oid"],
+                "username": me["email"],
+                "roles": me.get("roles", []),
+            }
 
 except ImportError:
     log.error("from airflow.www_rbac.security import AirflowSecurityManager failed")
