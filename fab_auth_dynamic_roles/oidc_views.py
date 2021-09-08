@@ -85,7 +85,7 @@ class DynamicRoleAuthOIDCView(AuthOIDView):
                     role = sm.find_role(role_name)
                     if role is not None:
                         user.roles.append(role)
-                        log.info(f"assign role: {role_name}, find_role: {role} to user: {userinfo.get(EMAIL_OAUTH_FIELD)}")
+                        log.info(f"assign role: {role_name}, find_role: {role} to user: {info.get(EMAIL_OIDC_FIELD)}")
                     else:
                         log.error(f"role: {role_name} doesn't exist")
                 sm.update_user(user)
