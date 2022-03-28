@@ -31,8 +31,8 @@ log = logging.getLogger(__name__)
 class DynamicRoleAuthOAuthView(AuthOAuthView):
 
     @expose("/login/")
-    @expose("/login/<provider>")
-    @expose("/login/<provider>/<register>")
+    @expose("/login/<provider>/")
+    @expose("/login/<provider>/<register>/")
     def login(self, provider=None, register=None):
         log.debug("Provider: {0}".format(provider))
         if g.user is not None and g.user.is_authenticated:
@@ -87,7 +87,7 @@ class DynamicRoleAuthOAuthView(AuthOAuthView):
             flash(as_unicode(self.invalid_login_message), "warning")
             return redirect(self.appbuilder.get_url_for_index)
 
-    @expose("/oauth-authorized/<provider>")
+    @expose("/oauth-authorized/<provider>/")
     def oauth_authorized(self, provider):
         log.debug("Authorized init")
         resp = self.appbuilder.sm.oauth_remotes[provider].authorize_access_token()
